@@ -13,6 +13,6 @@ app.use(cors());
 app.use(express.json());
 
 // Using routes
-app.use("/users", usersRoute);
+app.use("/api", usersRoute);
 
 app.listen(PORT, () => console.log("Welcome to Budgeter 💰💰💰"));
