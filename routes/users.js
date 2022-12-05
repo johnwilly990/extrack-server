@@ -4,6 +4,8 @@ const usersController = require("../controllers/usersController");
 const signUpValidation = require("../middlewares/userValidation");
 const loginValidation = require("../middlewares/userValidation");
 
+router.get("/profile", usersController.getUserProfile);
+
 router.post("/register", signUpValidation, usersController.userSignUp);
 
 router.post("/login", loginValidation, usersController.userLogin);
