@@ -1,5 +1,6 @@
-const { validationResult, body, check } = require("express-validator");
+const { validationResult, body } = require("express-validator");
 
+// Middleware for registration to check if all required fields are the correct format
 module.exports = registerValidation = async (req, res, next) => {
   body("username").isEmail().normalizeEmail();
   body("password").isLength({
@@ -20,6 +21,7 @@ module.exports = registerValidation = async (req, res, next) => {
   next();
 };
 
+// Middleware for login to check if all required fields are the correct format
 module.exports = loginValidation = async (req, res, next) => {
   body("username").isEmail().normalizeEmail();
   body("password").isLength({
