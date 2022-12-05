@@ -1,18 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { body } = require("express-validator");
 const usersController = require("../controllers/usersController");
+const signUpValidation = require("../middlewares/userValidation");
+const loginValidation = require("../middlewares/userValidation");
 
-// router.route("/").get(usersController.getAll);
+router.post("/register", signUpValidation, usersController.userSignUp);
 
-router.route("/register").post(
-  body("username").isEmail().normalizeEmail(),
-  body("password").isLength({
-    min: 8,
-  }),
-  body("first_name").isString(),
-  body("last_name").isString(),
-  usersController.userSignUp
-);
+router.post("/login", loginValidation, usersController.userLogin);
 
 module.exports = router;
