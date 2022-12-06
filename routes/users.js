@@ -1,13 +1,18 @@
 const express = require("express");
 const router = express.Router();
+const credentialsController = require("../controllers/credentialsController");
 const usersController = require("../controllers/usersController");
 const signUpValidation = require("../middlewares/userValidation");
 const loginValidation = require("../middlewares/userValidation");
 
-router.get("/profile", usersController.getUserProfile);
+// Credential endpoints
+router.post("/register", signUpValidation, credentialsController.userSignUp);
+router.post("/login", loginValidation, credentialsController.userLogin);
 
-router.post("/register", signUpValidation, usersController.userSignUp);
-
-router.post("/login", loginValidation, usersController.userLogin);
+// User endpoints
+router
+  .route("/profile")
+  .get(usersController.getUserProfile)
+  .put(usersController.updateUserFunds);
 
 module.exports = router;
