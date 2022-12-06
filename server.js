@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 const { PORT } = process.env || 8080;
 const usersRoute = require("./routes/users");
-const expensesRoute = require("./routes/expenses");
+const recurringRoute = require("./routes/recurringExpenses");
 
 // Connect server to client
 app.use(cors());
@@ -14,5 +14,6 @@ app.use(express.json());
 
 // Using routes
 app.use("/api", usersRoute);
+app.use("/api/recurring", recurringRoute);
 
 app.listen(PORT, () => console.log("Welcome to Budgeter 💰💰💰"));
