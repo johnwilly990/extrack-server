@@ -68,7 +68,7 @@ exports.addEntry = async (req, res) => {
 exports.updateEntry = async (res, req) => {};
 
 // Get all flexible expense entries
-exports.getAllEntries = (res, req) => {
+exports.getAllEntries = (req, res) => {
   const { authorization } = req.headers;
 
   const token = authorization.split(" ")[1];
