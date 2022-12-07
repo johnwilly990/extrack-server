@@ -172,3 +172,28 @@ exports.deleteEntry = async (req, res) => {
     return res.status(500).json({ message: err });
   }
 };
+
+exports.getAllEntries = (req, res) => {
+  const { authorization } = req.headers;
+
+  const token = authorization.split(" ")[1];
+  jwt.verify(token, SECRET_KEY, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({
+        message: "Invalid token",
+      });
+    }
+
+    const users = await db("recurring_expenses_entries")
+      .where({
+        user_id: decoded.id,
+      })
+      .select("id", "item_name", "amount", "category");
+
+    if (users.length === 0) {
+      return res.status(400).json({ message: "No recurring expenses found" });
+    }
+
+    return res.status(200).json(users);
+  });
+};
