@@ -138,90 +138,36 @@ exports.deleteEntry = async (req, res) => {
     }
 
     const token = authorization.split(" ")[1];
-    jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    jwt.verify(token, SECRET_KEY, async (err, decoded) => {
       if (err) {
         return res.status(401).json({
           message: "Invalid token",
         });
       }
 
-      // Delete entry
-      db("recurring_expenses_entries")
-        .del()
-        .where({ id: id })
-        .then(() => {
-          // Sums all entries
-          db("recurring_expenses_entries")
-            .select("user_id")
-            .sum("amount")
-            .groupBy("user_id")
-            .then((data) => {
-              // Finds the corresponding sum of user ID
-              const correspondingId = data.find(
-                (sum) => sum.user_id === decoded.id
-              );
-
-              // If no sum of specified user ID not found, assign recurring_amount in users table to 0
-              if (!correspondingId) {
-                db("users")
-                  .where({ id: decoded.id })
-                  .update({
-                    recurring_amount: 0,
-                  })
-                  .then((data) => console.log(data));
-
-                return res.status(200).json({
-                  message:
-                    "Entry successfully deleted. Recurring amount set to 0",
-                });
-              }
-
-              // Grab just numerical value of sum and assign it to recurring amount in users table
-              const sumOfReccuring = Object.values(correspondingId)[1];
-              db("users").where({ id: decoded.id }).update({
-                recurring_amount: sumOfReccuring,
-              });
-
-              return res.status(200).json({
-                message: `Entry successfully deleted. Recurring amount set to ${sumOfReccuring}`,
-              });
-            });
-        })
-        .catch((err) => {
-          return res.status(400).json({ message: err });
-        });
-      /*
-      // Deletes entry based on ID
+      //Deletes entry based on ID
       await db("recurring_expenses_entries").del().where({ id: id });
 
       // Sums all recurring expenses of same user ID
       const sumRecurringArr = await db("recurring_expenses_entries")
-        .select("user_id")
-        .sum("amount")
-        .groupBy("user_id");
-
-      // Returns object with matching user Id
-      const correspondingId = sumRecurringArr.find(
-        (sum) => sum.user_id === decoded.id
-      );
-      console.log(correspondingId);
+        .where("user_id", decoded.id)
+        .sum("amount");
 
       // Retrieves sum value
-      const sumOfReccuring = Object.values(correspondingId)[1];
+      const sumOfReccuring = Object.values(sumRecurringArr[0])[0];
 
       // Updates Users table with summed value
       await db("users")
         .where({ id: decoded.id })
         .update({
-          recurring_amount: sumOfReccuring === undefined ? sumOfReccuring : 0,
+          recurring_amount: sumOfReccuring === null ? 0 : sumOfReccuring,
         });
 
       return res.status(200).json({
         message: `Entry successfully deleted. Recurring amount set to ${
-          sumOfReccuring === undefined ? sumOfReccuring : 0
+          sumOfReccuring === null ? 0 : sumOfReccuring
         }`,
       });
-      */
     });
   } catch (err) {
     return res.status(500).json({ message: err });
