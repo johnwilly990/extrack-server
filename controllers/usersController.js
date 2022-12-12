@@ -105,9 +105,36 @@ exports.updateUserFunds = async (req, res) => {
         .where({ id: decoded.id })
         .update(updatedValues);
 
+      // Sums budget
+      const budgetArr = await db("users")
+        .where({ id: decoded.id })
+        .select(
+          "income_amount",
+          "recurring_amount",
+          "saving_amount",
+          "flexible_expense_amount",
+          "investment_amount"
+        );
+
+      // Selects first index
+      const budget = budgetArr[0];
+
+      // Calculates budget
+      const sum =
+        budget.income_amount -
+        budget.recurring_amount -
+        budget.saving_amount -
+        budget.investment_amount -
+        budget.flexible_expense_amount;
+
+      // Updates budget_amount in table
+      await db("users")
+        .where({ id: decoded.id })
+        .update({ budget_amount: sum });
+
       // Returns successful response
       return res.status(200).json({
-        message: `Income succesfully updated to ${income_amount} \n Saving successfully updated to ${saving_amount} \n Investment successfully updated to ${investment_amount}`,
+        message: "User funds successfully updated",
         user: `Number of users updated, ${user}`,
       });
     });
