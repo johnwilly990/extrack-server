@@ -5,8 +5,10 @@ const recurringController = require("../controllers/recurringController");
 router
   .route("/")
   .post(recurringController.addEntry)
-  .put(recurringController.updateEntry)
   .get(recurringController.getAllEntries);
-router.delete("/:id", recurringController.deleteEntry);
+router
+  .route("/:id")
+  .delete(recurringController.deleteEntry)
+  .put(recurringController.updateEntry);
 
 module.exports = router;
