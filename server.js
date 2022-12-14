@@ -5,7 +5,7 @@ const cors = require("cors");
 const { PORT } = process.env || 8080;
 const usersRoute = require("./routes/users");
 const recurringRoute = require("./routes/recurringExpenses");
-const flexibleRoute = require("./routes/flexibleExpneses");
+const flexibleRoute = require("./routes/flexibleExpenses");
 
 // Connect server to client
 app.use(cors());
