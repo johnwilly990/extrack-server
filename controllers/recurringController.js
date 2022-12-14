@@ -19,7 +19,7 @@ exports.addEntry = async (req, res) => {
 
     // Verify valid token
     const token = authorization.split(" ")[1];
-    jwt.verify(token, SECRET_KEY, async (err, _decoded) => {
+    jwt.verify(token, SECRET_KEY, async (err, decoded) => {
       if (err) {
         return res.status(401).json({
           message: "Invalid token",
@@ -29,7 +29,7 @@ exports.addEntry = async (req, res) => {
       // New object to be added into db
       const newEntry = {
         id: uuid(),
-        user_id: user_id,
+        user_id: decoded.id,
         item_name: item_name,
         amount: amount,
         category: category,
@@ -40,22 +40,43 @@ exports.addEntry = async (req, res) => {
 
       // Sums all recurring expenses of same user ID
       const sumRecurringArr = await db("recurring_expenses_entries")
-        .select("user_id")
-        .sum("amount")
-        .groupBy("user_id");
-
-      // Returns object with matching user Id
-      const correspondingId = sumRecurringArr.find(
-        (sum) => sum.user_id === newEntry.user_id
-      );
+        .where("user_id", decoded.id)
+        .sum("amount");
 
       // Retrieves sum value
-      const sumOfReccuring = Object.values(correspondingId)[1];
+      const sumOfReccuring = Object.values(sumRecurringArr[0])[0];
 
       // Updates Users table with summed value
       await db("users")
-        .where({ id: user_id })
+        .where({ id: decoded.id })
         .update({ recurring_amount: sumOfReccuring });
+
+      // Sums budget
+      const budgetArr = await db("users")
+        .where({ id: decoded.id })
+        .select(
+          "income_amount",
+          "recurring_amount",
+          "saving_amount",
+          "flexible_expense_amount",
+          "investment_amount"
+        );
+
+      // Selects first index
+      const budget = budgetArr[0];
+
+      // Calculates budget
+      const sum =
+        budget.income_amount -
+        budget.recurring_amount -
+        budget.saving_amount -
+        budget.investment_amount -
+        budget.flexible_expense_amount;
+
+      // Updates budget_amount in table
+      await db("users")
+        .where({ id: decoded.id })
+        .update({ budget_amount: sum });
 
       return res.status(201).json({ message: "New entry successfully added" });
     });
@@ -67,6 +88,7 @@ exports.addEntry = async (req, res) => {
 exports.updateEntry = async (req, res) => {
   try {
     const { item_name, amount, user_id, category } = req.body;
+    const { id } = req.params;
     const { authorization } = req.headers;
 
     // Validate empty fields and negative or 0 values
@@ -78,7 +100,7 @@ exports.updateEntry = async (req, res) => {
 
     // Verify valid token
     const token = authorization.split(" ")[1];
-    jwt.verify(token, SECRET_KEY, async (err, _decoded) => {
+    jwt.verify(token, SECRET_KEY, async (err, decoded) => {
       if (err) {
         return res.status(401).json({
           message: "Invalid token",
@@ -87,35 +109,54 @@ exports.updateEntry = async (req, res) => {
 
       // New object to be added into db
       const entry = {
-        user_id: user_id,
+        user_id: decoded.id,
         item_name: item_name,
         amount: amount,
         category: category,
       };
 
       // Inserts new entry to db
-      await db("recurring_expenses_entries")
-        .where({ user_id: user_id, item_name: item_name })
-        .update(entry);
+      await db("recurring_expenses_entries").where({ id: id }).update(entry);
 
       // Sums all recurring expenses of same user ID
       const sumRecurringArr = await db("recurring_expenses_entries")
-        .select("user_id")
-        .sum("amount")
-        .groupBy("user_id");
-
-      // Returns object with matching user Id
-      const correspondingId = sumRecurringArr.find(
-        (sum) => sum.user_id === entry.user_id
-      );
+        .where("user_id", decoded.id)
+        .sum("amount");
 
       // Retrieves sum value
-      const sumOfReccuring = Object.values(correspondingId)[1];
+      const sumOfReccuring = Object.values(sumRecurringArr[0])[0];
 
       // Updates Users table with summed value
       await db("users")
-        .where({ id: user_id })
+        .where({ id: decoded.id })
         .update({ recurring_amount: sumOfReccuring });
+
+      // Sums budget
+      const budgetArr = await db("users")
+        .where({ id: decoded.id })
+        .select(
+          "income_amount",
+          "recurring_amount",
+          "saving_amount",
+          "flexible_expense_amount",
+          "investment_amount"
+        );
+
+      // Selects first index
+      const budget = budgetArr[0];
+
+      // Calculates budget
+      const sum =
+        budget.income_amount -
+        budget.recurring_amount -
+        budget.saving_amount -
+        budget.investment_amount -
+        budget.flexible_expense_amount;
+
+      // Updates budget_amount in table
+      await db("users")
+        .where({ id: decoded.id })
+        .update({ budget_amount: sum });
 
       return res.status(200).json({ message: "Entry successfully updated" });
     });
@@ -162,6 +203,33 @@ exports.deleteEntry = async (req, res) => {
         .update({
           recurring_amount: sumOfReccuring === null ? 0 : sumOfReccuring,
         });
+
+      // Sums budget
+      const budgetArr = await db("users")
+        .where({ id: decoded.id })
+        .select(
+          "income_amount",
+          "recurring_amount",
+          "saving_amount",
+          "flexible_expense_amount",
+          "investment_amount"
+        );
+
+      // Selects first index
+      const budget = budgetArr[0];
+
+      // Calculates budget
+      const sum =
+        budget.income_amount -
+        budget.recurring_amount -
+        budget.saving_amount -
+        budget.investment_amount -
+        budget.flexible_expense_amount;
+
+      // Updates budget_amount in table
+      await db("users")
+        .where({ id: decoded.id })
+        .update({ budget_amount: sum });
 
       return res.status(200).json({
         message: `Entry successfully deleted. Recurring amount set to ${
