@@ -232,9 +232,7 @@ exports.deleteEntry = async (req, res) => {
         .update({ budget_amount: sum });
 
       return res.status(200).json({
-        message: `Entry successfully deleted. Recurring amount set to ${
-          sumOfReccuring === null ? 0 : sumOfReccuring
-        }`,
+        message: "Entry successfully deleted",
       });
     });
   } catch (err) {
