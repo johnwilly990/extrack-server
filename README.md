@@ -106,13 +106,9 @@ openssl rand -base64 12
 
 ## API Endpoints
 
-NOTE: All enpoints except `/api/signup` and `/api/login` require to be sent as `headers`
+NOTE: All enpoints except `/api/signup` and `/api/login` require `Authorization: Bearer token` sent as `headers`
 
-```json
-{
-  headers: {Authorization: `Bearer ${token}`}
-}
-```
+NOTE: 0 values will only be for new users. Users that are already in the database will have values they've already inputted
 
 ### Error Messages
 
@@ -142,12 +138,12 @@ Signs up new user
 - Request body should have the following properties as an example:
 
 ```json
- {
-   "username": username,
-   "password": password,
-   "first_name": first_name,
-   "last_name": last_name
- }
+{
+  "username": "username",
+  "password": "password",
+  "first_name": "John",
+  "last_name": "Kim"
+}
 ```
 
 - Response returns 400 if unsuccessful because of missing properties in the request body
@@ -167,20 +163,20 @@ Logs in signed up user
 - Request body should have the following properties as an example:
 
 ```json
- {
-   "username": username,
-   "password": password,
- }
+{
+  "username": "username",
+  "password": "password"
+}
 ```
 
 - Response returns 400 if unsuccessful because of missing properties in the request body
 - Response returns 201 if successful:
 
 ```json
- {
-   "message": "User logged in successfully",
-   "token": token,
- }
+{
+  "message": "User logged in successfully",
+  "token": "token"
+}
 ```
 
 ### `GET /api/profile`
@@ -191,16 +187,16 @@ Get user info based on JWT token
 
 ```json
 {
-  "id": <id>,
-  "username": <username>,
-  "first_name": <first_name>,
-  "last_name": <last_name>,
-  "income_amount": <income_amount>,
-  "budget_amount": <budget_amount>,
-  "saving_amount": <saving_amount>,
-  "investment_amount": <investment_amount>,
-  "recurring_amount": <recurring_amount>,
-  "flexible_expense_amount": <flexible_expense_amount>
+  "id": "id",
+  "username": "username",
+  "first_name": "John",
+  "last_name": "Kim",
+  "income_amount": 0,
+  "budget_amount": 0,
+  "saving_amount": 0,
+  "investment_amount": 0,
+  "recurring_amount": 0,
+  "flexible_expense_amount": 0
 }
 ```
 
@@ -212,9 +208,9 @@ Updates user funds (income, savings, investments)
 
 ```json
 {
-   "income_amount": income_amount,
-   "saving_amount": saving_amount,
-   "investment_amount": investment_amount
+  "income_amount": 0,
+  "saving_amount": 0,
+  "investment_amount": 0
 }
 ```
 
@@ -222,8 +218,7 @@ Updates user funds (income, savings, investments)
 
 ```json
 {
-   "message": "User funds successfully updated",
-   "user": `Number of users updated, ${user}`,
+  "message": "User funds successfully updated"
 }
 ```
 
@@ -235,9 +230,9 @@ Posts new recurring expense entry
 
 ```json
 {
-   "item_name": item_name,
-   "amount": amount,
-   "category": category
+  "item_name": "Netflix",
+  "amount": 15,
+  "category": "Subscriptions"
 }
 ```
 
@@ -256,12 +251,20 @@ Gets all recurring expenses of user
 - Response returns 200 if successful:
 
 ```json
-{
-   "id": <id>,
-   "item_name": <item_name>,
-   "amount": <amount>,
-   "category": <category>
-}
+[
+  {
+    "id": "id",
+    "item_name": "Netflix",
+    "amount": 15,
+    "category": "Subscriptions"
+  },
+  {
+    "id": "id",
+    "item_name": "Rent",
+    "amount": 1500,
+    "category": "Rent"
+  }
+]
 ```
 
 - Response returns 400 if unsuccessful:
@@ -280,9 +283,9 @@ Updates recurring expense based on `id`
 
 ```json
 {
-   "item_name": item_name,
-   "amount": amount,
-   "category": category
+  "item_name": "Netflix",
+  "amount": 30,
+  "category": "Subscriptions"
 }
 ```
 
@@ -314,9 +317,9 @@ Posts new flexible expense entry
 
 ```json
 {
-   "item_name": item_name,
-   "amount": amount,
-   "category": category
+  "item_name": "Air Force 1",
+  "amount": 150,
+  "category": "Apparel"
 }
 ```
 
@@ -335,12 +338,20 @@ Gets all fleixble expenses of user
 - Response returns 200 if successful:
 
 ```json
-{
-   "id": <id>,
-   "item_name": <item_name>,
-   "amount": <amount>,
-   "category": <category>
-}
+[
+  {
+    "id": "id",
+    "item_name": "Air Force 1",
+    "amount": 150,
+    "category": "Apparel"
+  },
+  {
+    "id": "id",
+    "item_name": "McDonalds",
+    "amount": 15,
+    "category": "Dining"
+  }
+]
 ```
 
 - Response returns 400 if unsuccessful:
@@ -359,9 +370,9 @@ Updates flexible expense based on `id`
 
 ```json
 {
-   "item_name": item_name,
-   "amount": amount,
-   "category": category
+  "item_name": "Air Force 1",
+  "amount": 200,
+  "category": "Apparel"
 }
 ```
 
