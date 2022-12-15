@@ -101,9 +101,7 @@ exports.updateUserFunds = async (req, res) => {
       };
 
       // Puts body into db
-      const user = await db("users")
-        .where({ id: decoded.id })
-        .update(updatedValues);
+      await db("users").where({ id: decoded.id }).update(updatedValues);
 
       // Sums budget
       const budgetArr = await db("users")
@@ -135,7 +133,6 @@ exports.updateUserFunds = async (req, res) => {
       // Returns successful response
       return res.status(200).json({
         message: "User funds successfully updated",
-        user: `Number of users updated, ${user}`,
       });
     });
   } catch (err) {
