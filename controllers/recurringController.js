@@ -36,10 +36,10 @@ exports.addEntry = async (req, res) => {
       };
 
       // Inserts new entry to db
-      await db("recurring_expenses_entries").insert(newEntry);
+      await db("recurring_entries").insert(newEntry);
 
       // Sums all recurring expenses of same user ID
-      const sumRecurringArr = await db("recurring_expenses_entries")
+      const sumRecurringArr = await db("recurring_entries")
         .where("user_id", decoded.id)
         .sum("amount");
 
@@ -116,10 +116,10 @@ exports.updateEntry = async (req, res) => {
       };
 
       // Inserts new entry to db
-      await db("recurring_expenses_entries").where({ id: id }).update(entry);
+      await db("recurring_entries").where({ id: id }).update(entry);
 
       // Sums all recurring expenses of same user ID
-      const sumRecurringArr = await db("recurring_expenses_entries")
+      const sumRecurringArr = await db("recurring_entries")
         .where("user_id", decoded.id)
         .sum("amount");
 
@@ -171,7 +171,7 @@ exports.deleteEntry = async (req, res) => {
     const { authorization } = req.headers;
 
     // Checks if ID exists in db
-    const databaseId = await db("recurring_expenses_entries").where({ id: id });
+    const databaseId = await db("recurring_entries").where({ id: id });
     if (!databaseId.length) {
       return res.status(400).json({
         message: `Invalid ID ${id}`,
@@ -187,10 +187,10 @@ exports.deleteEntry = async (req, res) => {
       }
 
       //Deletes entry based on ID
-      await db("recurring_expenses_entries").del().where({ id: id });
+      await db("recurring_entries").del().where({ id: id });
 
       // Sums all recurring expenses of same user ID
-      const sumRecurringArr = await db("recurring_expenses_entries")
+      const sumRecurringArr = await db("recurring_entries")
         .where("user_id", decoded.id)
         .sum("amount");
 
@@ -253,7 +253,7 @@ exports.getAllEntries = (req, res) => {
     }
 
     // Gets all entries by user_id
-    const users = await db("recurring_expenses_entries")
+    const users = await db("recurring_entries")
       .where({
         user_id: decoded.id,
       })

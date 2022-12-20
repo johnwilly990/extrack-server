@@ -37,10 +37,10 @@ exports.addEntry = async (req, res) => {
       };
 
       // Inserts new entry to db
-      await db("flexible_expenses_entries").insert(newEntry);
+      await db("flexible_entries").insert(newEntry);
 
       // Sums all recurring expenses of same user ID
-      const sumRecurringArr = await db("flexible_expenses_entries")
+      const sumRecurringArr = await db("flexible_entries")
         .where("user_id", decoded.id)
         .sum("amount");
 
@@ -91,10 +91,10 @@ exports.updateEntry = async (req, res) => {
       };
 
       // Inserts new entry to db
-      await db("flexible_expenses_entries").where({ id: id }).update(entry);
+      await db("flexible_entries").where({ id: id }).update(entry);
 
       // Sums all recurring expenses of same user ID
-      const sumRecurringArr = await db("flexible_expenses_entries")
+      const sumRecurringArr = await db("flexible_entries")
         .where("user_id", decoded.id)
         .sum("amount");
 
@@ -152,7 +152,7 @@ exports.getAllEntries = (req, res) => {
       });
     }
 
-    const users = await db("flexible_expenses_entries")
+    const users = await db("flexible_entries")
       .where({
         user_id: decoded.id,
       })
