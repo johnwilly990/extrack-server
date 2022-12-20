@@ -27,8 +27,7 @@ module.exports = (req, res, next) => {
     if (err) return res.status(403).json({ error: "Invalid JWT token" });
 
     // Assigns userId to user_id coming from JWT token
-    req.userId = decoded.user_id;
-    console.log(decoded.user_id);
+    req.userId = decoded.id;
 
     // Once verified, moves on
     next();
