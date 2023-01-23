@@ -110,13 +110,39 @@ exports.updateEntry = async (req, res) => {
   }
 };
 
+exports.deleteEntry = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Checks if ID exists in db
+    const databaseId = await db("flexible_entries").where({ id: id });
+    if (!databaseId.length) {
+      return res.status(400).json({
+        message: `Invalid ID ${id}`,
+      });
+    }
+
+    //Deletes entry based on ID
+    await db("flexible_entries").del().where({ id: id });
+
+    await sumEntry(req.userId);
+    await sumBudget(req.userId);
+
+    return res.status(200).json({
+      message: "Entry successfully deleted",
+    });
+  } catch (err) {
+    return res.status(500).json({ message: err });
+  }
+};
+
 // Get all flexible expense entries
 exports.getAllEntries = async (req, res) => {
   const users = await db("flexible_entries")
     .where({
       user_id: req.userId,
     })
-    .select("id", "item_name", "amount", "category");
+    .select("id", "item_name", "amount", "category", "created_at");
 
   if (users.length === 0) {
     return res.status(400).json({ message: "No flexible expenses found" });

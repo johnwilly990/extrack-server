@@ -53,7 +53,6 @@ exports.getUserProfile = async (req, res) => {
 
       // Deletes properties from object we don't want to show on user profile
       delete user.password;
-      delete user.created_at;
       delete user.updated_at;
 
       return res.json(user);
@@ -66,19 +65,11 @@ exports.getUserProfile = async (req, res) => {
 // Controller for updating user funds
 exports.updateUserFunds = async (req, res) => {
   try {
-    const { income_amount, saving_amount, investment_amount } = req.body;
+    const { income_amount } = req.body;
     const { authorization } = req.headers;
 
     // Validation to check for empty fields and data types
-    if (
-      Object.keys(req.body).length < 3 ||
-      typeof income_amount === "string" ||
-      typeof saving_amount === "string" ||
-      typeof investment_amount === "string" ||
-      income_amount < 0 ||
-      saving_amount < 0 ||
-      investment_amount < 0
-    ) {
+    if (typeof income_amount === "string" || income_amount < 0) {
       return res
         .status(400)
         .send("Please input a valid numerical value for all fields");
@@ -96,8 +87,6 @@ exports.updateUserFunds = async (req, res) => {
       // Request body object
       const updatedValues = {
         income_amount: income_amount,
-        saving_amount: saving_amount,
-        investment_amount: investment_amount,
       };
 
       // Puts body into db

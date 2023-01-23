@@ -141,7 +141,7 @@ exports.getAllEntries = async (req, res) => {
     .where({
       user_id: req.userId,
     })
-    .select("id", "item_name", "amount", "category");
+    .select("id", "item_name", "amount", "category", "created_at");
 
   // Returns error response if no entries
   if (users.length === 0) {

@@ -8,6 +8,9 @@ router
   .post(authorize, flexibleController.addEntry)
   .get(authorize, flexibleController.getAllEntries);
 
-router.put("/:id", authorize, flexibleController.updateEntry);
+router
+  .route("/:id")
+  .put(authorize, flexibleController.updateEntry)
+  .delete(authorize, flexibleController.deleteEntry);
 
 module.exports = router;
