@@ -13,7 +13,7 @@ git clone https://github.com/johnwilly990/budgeter-server.git
 Go to the project directory
 
 ```bash
-cd budgeter-server
+cd extrack-server
 ```
 
 Install dependencies
