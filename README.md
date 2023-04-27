@@ -1,6 +1,6 @@
 # ![budgeter-logo](https://user-images.githubusercontent.com/88567467/207757998-483a12d5-8cf4-45a4-b14d-cb9d0350b403.svg) ExTrack API
 
-API created to serve financial data to Budgeter from a database
+API created to serve financial data to ExTrack from a database
 
 ## Run Locally / Usage
 
